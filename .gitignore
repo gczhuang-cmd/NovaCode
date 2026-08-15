@@ -26,3 +26,8 @@ build/
 .novacode/memory/
 # Claude Code 本地设置
 .claude/
+
+# 开发辅助文件（AI 协作痕迹 / 示例，不入库，本地保留）
+CLAUDE.md
+HANDOFF.md
+examples/
