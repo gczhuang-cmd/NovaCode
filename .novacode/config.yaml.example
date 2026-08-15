@@ -1,0 +1,35 @@
+# NovaCode 配置文件模板
+#
+# 使用方法：复制本文件为 config.yaml 并填入真实密钥
+#   cp config.yaml.example config.yaml
+# （config.yaml 含密钥，已被 .gitignore 忽略，不会入库）
+#
+# ch09 附加目录与文件：
+# - 项目指令 novaCODE.md（三层，优先级从高到低）：
+#     <项目根>/novaCODE.md
+#     <项目根>/.novacode/novaCODE.md
+#     ~/.novacode/novaCODE.md
+#   指令支持 `@include <相对路径>` 引用（深度上限 5 层，自动做环路/越界检测）。
+# - 会话存档：.novacode/sessions/<YYYYMMDD-HHMMSS-xxxx>/conversation.jsonl（JSONL 实时追加）
+# - 自动笔记：.novacode/memory/（项目级）与 ~/.novacode/memory/（用户级），索引为 MEMORY.md
+
+providers:
+  # anthropic 协议条目
+  - name: "Anthropic 主模型"
+    protocol: anthropic
+    api_key: "sk-ant-xxxxx"
+    model: "claude-sonnet-5"
+    # 自定义端点（接入兼容服务时填写），留空则用官方默认端点
+    # base_url: "https://your-compatible-endpoint.example.com"
+    # 是否开启扩展思考（仅 anthropic 生效）
+    thinking: true
+    # 上下文窗口（token）；可选，未配置时按 protocol 默认（anthropic 200000、openai 128000）
+    context_window: 200000
+
+  # openai 协议条目示例（默认注释掉；需要时取消注释并填写）
+  # - name: "OpenAI"
+  #   protocol: openai
+  #   api_key: "sk-xxxxx"
+  #   model: "gpt-4o-mini"
+  #   # base_url: "https://your-compatible-endpoint.example.com/v1"
+  #   thinking: false

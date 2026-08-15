@@ -1,0 +1,24 @@
+# 权限配置示例：复制为 `settings.yaml`（项目级，可提交）或 `settings.local.yaml`（本地级，gitignore）。
+#
+# 三层配置文件（就近命中，本地 > 项目 > 用户）：
+#   - 用户级：~/.novacode/settings.yaml
+#   - 项目级：<项目根>/.novacode/settings.yaml
+#   - 本地级：<项目根>/.novacode/settings.local.yaml（gitignore，人在回路「永久」放行写入处）
+#
+# 规则写法：`工具友好名(模式)`，工具名 Bash/Read/Write/Edit/Glob/Grep；
+#   模式支持精确（`Bash(git status)`）与 glob（`Bash(git *)`、`Write(src/**)`）；
+#   不带模式段（`Bash`）匹配该工具全部调用。`*` 任意字符；`**` 跨目录（仅文件路径）。
+#   同层内 deny 优先于 allow；任一文件的格式错误只降级为空规则集，不致引擎构造失败。
+#
+# default_mode：default / acceptEdits / plan / bypassPermissions（可选；未配置默认 default）。
+#   - 只读类默认即 Allow，allow 规则主要用于提前放行 Bash/Write；
+#   - deny 规则可对只读做围栏（如 `Read(.env)` 禁止读密钥文件）。
+default_mode: default
+permissions:
+  allow:
+    - "Bash(git *)"
+    - "Bash(pytest)"
+  deny:
+    - "Bash(rm *)"
+    - "Read(.env)"
+    - "Write(.env)"

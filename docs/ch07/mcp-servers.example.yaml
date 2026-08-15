@@ -1,0 +1,26 @@
+# MCP server 配置示例。
+#
+# 放置位置：
+#   - 项目级：<项目根>/.novacode.yaml（随项目提交，团队共享）
+#   - 用户级：~/.novacode/config.yaml（个人偏好，不入库）
+# 同名 server 项目级完整覆盖用户级（不按字段合并）。
+#
+# 变量展开：
+#   - env / headers 的**值**支持 ${VAR} 从宿主环境变量展开（密钥不落盘）；
+#   - command / args / server 名 / 工具名不做展开。
+mcp_servers:
+  github:
+    type: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-github"]
+    env:
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"
+  local-sqlite:
+    type: stdio
+    command: python
+    args: ["-m", "mcp_server_sqlite", "--db", "./data.db"]
+  example-http:
+    type: http
+    url: "https://mcp.example.com/mcp"
+    headers:
+      Authorization: "Bearer ${EXAMPLE_TOKEN}"
