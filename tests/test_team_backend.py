@@ -94,6 +94,39 @@ def test_inprocess_spawn_kill():
     asyncio.run(go())
 
 
+def test_inprocess_spawn_inherits_worktree_cwd_without_leaking(tmp_path):
+    """An in-process teammate's relative tools must not touch the lead checkout."""
+    from novacode.tool.ctx import resolve_path, with_cwd
+
+    parent = str(tmp_path / "parent")
+    worker = str(tmp_path / "worker")
+    seen: list[str] = []
+
+    class InspectingTaskMgr(FakeTaskMgr):
+        async def launch(self, ag, conv, name, task):
+            seen.append(resolve_path("probe.txt"))
+
+            async def child():
+                seen.append(resolve_path("probe.txt"))
+
+            # Mirrors the actual task manager's create_task context capture.
+            await asyncio.create_task(child())
+            return "task_1"
+
+    async def go():
+        backend = new_backend(BackendType.IN_PROCESS, task_mgr=InspectingTaskMgr())
+        req = _req(worktree_path=worker)
+        req.sub_agent = object()
+        req.conv = object()
+        with with_cwd(parent):
+            assert resolve_path("probe.txt") == parent + "/probe.txt"
+            await backend.spawn(req)
+            assert resolve_path("probe.txt") == parent + "/probe.txt"
+
+    asyncio.run(go())
+    assert seen == [worker + "/probe.txt", worker + "/probe.txt"]
+
+
 def test_new_backend_unknown():
     import pytest
 
