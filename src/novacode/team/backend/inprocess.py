@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ...tool.ctx import with_cwd
 from ..types import BackendType
 from . import SpawnRequest
 
@@ -19,9 +20,12 @@ class InProcessBackend:
         """调 task_mgr.launch 起 asyncio task；返回 ("", task_id)。"""
         if self._task_mgr is None:
             raise RuntimeError("in-process backend 需要 task_mgr")
-        agent_id = await self._task_mgr.launch(
-            req.sub_agent, req.conv, req.member_name, req.initial_prompt
-        )
+        # launch creates the child's asyncio task. Capture its own worktree cwd
+        # in that task's ContextVar snapshot, not the lead's checkout cwd.
+        with with_cwd(req.worktree_path):
+            agent_id = await self._task_mgr.launch(
+                req.sub_agent, req.conv, req.member_name, req.initial_prompt
+            )
         return "", agent_id
 
     async def wake(self, pane_id: str, agent_id: str) -> None:
